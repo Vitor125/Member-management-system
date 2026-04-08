@@ -1,0 +1,96 @@
+const form = document.getElementById("membro-form");
+const mensagem = document.getElementById("mensagem");
+const membrosBody = document.getElementById("membros-body");
+const botaoRecarregar = document.getElementById("recarregar");
+const API_BASE_URL = "http://127.0.0.1:5000";
+
+function mostrarMensagem(texto, tipo) {
+  mensagem.textContent = texto;
+  mensagem.className = `mensagem ${tipo}`;
+}
+
+function formatarData(valor) {
+  if (!valor) return "";
+
+  const data = new Date(valor);
+  if (Number.isNaN(data.getTime())) return valor;
+
+  return data.toLocaleDateString("pt-BR");
+}
+
+function renderizarTabela(membros) {
+  membrosBody.innerHTML = "";
+
+  if (!membros.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td colspan="5">Nenhum membro encontrado.</td>';
+    membrosBody.appendChild(tr);
+    return;
+  }
+
+  for (const membro of membros) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${membro.id ?? ""}</td>
+      <td>${membro.nome ?? ""}</td>
+      <td>${formatarData(membro.data_de_nascimento)}</td>
+      <td>${membro.nome_dos_responsaveis ?? ""}</td>
+      <td>${membro.igreja_id ?? ""}</td>
+    `;
+    membrosBody.appendChild(tr);
+  }
+}
+
+async function carregarMembros() {
+  try {
+    const resposta = await fetch(`${API_BASE_URL}/membros_pg`);
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      throw new Error(dados.erro || "Erro ao carregar membros.");
+    }
+
+    renderizarTabela(dados);
+  } catch (erro) {
+    renderizarTabela([]);
+    mostrarMensagem(erro.message, "erro");
+  }
+}
+
+form.addEventListener("submit", async (evento) => {
+  evento.preventDefault();
+
+  const dadosForm = new FormData(form);
+  const payload = {
+    nome: dadosForm.get("nome"),
+    data_de_nascimento: dadosForm.get("data_de_nascimento"),
+    nome_dos_responsaveis: dadosForm.get("nome_dos_responsaveis"),
+    igreja_id: Number(dadosForm.get("igreja_id")),
+  };
+
+  try {
+    const resposta = await fetch(`${API_BASE_URL}/membros_pg`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      throw new Error(dados.erro || "Erro ao salvar membro.");
+    }
+
+    mostrarMensagem("Membro salvo com sucesso.", "ok");
+    form.reset();
+    await carregarMembros();
+  } catch (erro) {
+    mostrarMensagem(erro.message, "erro");
+  }
+});
+
+botaoRecarregar.addEventListener("click", carregarMembros);
+
+carregarMembros();
