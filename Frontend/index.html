@@ -1,1 +1,64 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Membros PG</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Membros PG</h1>
+
+    <section class="card">
+      <h2>Novo Membro</h2>
+      <form id="membro-form">
+        <label>
+          Nome
+          <input type="text" name="nome" required />
+        </label>
+
+        <label>
+          Data de nascimento
+          <input type="date" name="data_de_nascimento" required />
+        </label>
+
+        <label>
+          Nome dos responsaveis
+          <input type="text" name="nome_dos_responsaveis" required />
+        </label>
+
+        <label>
+          Igreja ID
+          <input type="number" name="igreja_id" min="1" required />
+        </label>
+
+        <button type="submit">Salvar</button>
+      </form>
+      <p id="mensagem" class="mensagem"></p>
+    </section>
+
+    <section class="card">
+      <h2>Lista de Membros</h2>
+      <button id="recarregar" type="button">Recarregar</button>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Nascimento</th>
+              <th>Responsaveis</th>
+              <th>Igreja ID</th>
+            </tr>
+          </thead>
+          <tbody id="membros-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
